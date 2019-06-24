@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="c28c53ce-7640-4962-ab55-cb9a560ceda9" name="Default Changelist" comment="" />
+=======
+    <list default="true" id="c28c53ce-7640-4962-ab55-cb9a560ceda9" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/index.js" afterDir="false" />
+    </list>
+>>>>>>> 72115a4af16f4a58346cbfecc0642c3971d9f283
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,8 +25,13 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="450">
               <caret line="33" column="25" lean-forward="true" selection-start-line="33" selection-start-column="25" selection-end-line="33" selection-end-column="37" />
+=======
+            <state relative-caret-position="357">
+              <caret line="36" column="3" selection-start-line="36" selection-start-column="3" selection-end-line="36" selection-end-column="3" />
+>>>>>>> 72115a4af16f4a58346cbfecc0642c3971d9f283
             </state>
           </provider>
         </entry>
@@ -119,12 +131,20 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1561409337365</updated>
+<<<<<<< HEAD
       <workItem from="1561409339330" duration="4492000" />
+=======
+      <workItem from="1561409339330" duration="4070000" />
+>>>>>>> 72115a4af16f4a58346cbfecc0642c3971d9f283
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="4492000" />
+=======
+    <option name="totallyTimeSpent" value="4070000" />
+>>>>>>> 72115a4af16f4a58346cbfecc0642c3971d9f283
   </component>
   <component name="ToolWindowManager">
     <frame x="1912" y="-8" width="1936" height="1056" extended-state="6" />
@@ -140,7 +160,11 @@
       <window_info anchor="bottom" id="Event Log" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
+<<<<<<< HEAD
       <window_info anchor="bottom" id="Run" order="2" weight="0.32936078" />
+=======
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32936078" />
+>>>>>>> 72115a4af16f4a58346cbfecc0642c3971d9f283
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -178,8 +202,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="450">
           <caret line="33" column="25" lean-forward="true" selection-start-line="33" selection-start-column="25" selection-end-line="33" selection-end-column="37" />
+=======
+        <state relative-caret-position="357">
+          <caret line="36" column="3" selection-start-line="36" selection-start-column="3" selection-end-line="36" selection-end-column="3" />
+>>>>>>> 72115a4af16f4a58346cbfecc0642c3971d9f283
         </state>
       </provider>
     </entry>
