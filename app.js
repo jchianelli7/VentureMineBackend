@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const db = require('./db');
 
 var app = express();
 
@@ -29,6 +30,11 @@ app.use(function(req, res, next) {
   next(createError(404));
 });
 
+db.connect(() => {
+  app.listen(process.env.PORT || 5555, function (){
+    console.log(`Listening`);
+  });
+});
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
@@ -40,13 +46,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-var db = require('./db');
 
-db.connect(() => {
-  app.listen(process.env.PORT || 5555, function (){
-    console.log(`Listening`);
-  });
-});
 
 
 module.exports = app;
