@@ -29,7 +29,7 @@ exports.getAuction = function(req, res){
 
 exports.addBid = function(req, res){
     console.log('adfadsf: ' + req.params.id);
-    Auction.findOneAndUpdate({_id: req.params.id}, {$push: {graphDataSets$0 : {data: {x: req.body.numShares, y: req.body.pps}}}}, function(err, auction){
+    Auction.findOneAndUpdate({_id: req.params.id}, {$push: {'graphDataSets.0.data' :  {x: req.body.pps, y: req.body.numShares}, } } , {new: true}, function(err, auction){
        if(err){
            console.log(err);
        } else{

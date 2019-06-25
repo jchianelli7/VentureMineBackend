@@ -17,7 +17,7 @@ router.get('/:id', function(req, res){
 });
 
 router.post('/:id', function(req, res){
-   auctionController.addBid(req, res);
+   auctionController.addBid(req, res);      // ALSo is this how I should be usuinf x=controllers and stuff?
 });
 
 module.exports = router;
