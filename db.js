@@ -1,23 +1,11 @@
-const mongoClient = require('mongodb').MongoClient;
-const mongoDbUrl = 'mongodb+srv://vmUser:vmPassword%21@venturemine-b5fdf.mongodb.net/test?retryWrites=true&w=majority';
-let mongodb;
+let mongoose = require('mongoose');
+const server = '127.0.0.1:27017';
+const database = 'vmdb';
 
-function connect(callback){
-    mongoClient.connect(mongoDbUrl, (err, db) => {
-        mongodb = db;
-        callback();
+mongoose.connect('mongodb+srv://vmUser:vmPassword%21@venturemine-b5fdf.mongodb.net/vmdb?retryWrites=true&w=majority')
+    .then(() => {
+        console.log('Database connection successful');
+    })
+    .catch(err => {
+        console.error('Database connection error')
     });
-}
-function get(){
-    return mongodb;
-}
-
-function close(){
-    mongodb.close();
-}
-
-module.exports = {
-    connect,
-    get,
-    close
-};
