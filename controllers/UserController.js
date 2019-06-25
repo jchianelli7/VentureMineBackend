@@ -21,6 +21,7 @@ exports.authorize = function(req, res){
             console.log("Error: " + err);
         }
         if(user){
+            console.log("user:" , user);
             res.json(user);
         }else{
             res.status(400);
