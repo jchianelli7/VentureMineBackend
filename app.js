@@ -15,6 +15,11 @@ var database = require('./db');
 var originsWhitelist = [
     'http://localhost:4200'
 ];
+
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+app.set('io', io);
+
 var corsOptions = {
     origin: function (origin, callback) {
         var isWhitelisted = originsWhitelist.indexOf(origin) !== -1;
