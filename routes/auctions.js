@@ -63,7 +63,7 @@ router.get('/:id', function (req, res) {
         if(err){
             console.log("Error fetching Auction");
         }else{
-            res.json( auction);
+            res.json(auction);
         }
     });
 });

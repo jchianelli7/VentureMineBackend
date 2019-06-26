@@ -9,6 +9,7 @@ exports.getAuctions = function (req, res) {
             console.log("error: " + err);
         }
         if(auctions){
+            console.log("Got Auctions");
             res.json(auctions);
         }else{
             res.status(123);
