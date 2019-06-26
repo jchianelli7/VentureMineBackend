@@ -24,7 +24,7 @@ io.on("connection", socket => {
     socket.on("bidPlaced", bidData => {
         console.log("Bid Data:");
         console.log(bidData);
-        Auction.findOneAndUpdate({_id: bidData.auctionId}, {$push: {'graphDataSets.0.data' :  {x: bidData.pps, y: bidData.numShares}, } } , {new: true}, function(err, auction){
+        Auction.findByIdAndUpdate(bidData.auctionId, {$push: {'graphDataSets.0.data' :  {x: bidData.pps, y: bidData.numShares}, },  $inc: {currentStrikePrice: 1}}, {new: true}, function(err, auction){
             if(err){
                 console.log(err);
             } else{
