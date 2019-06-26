@@ -35,10 +35,8 @@ io.on("connection", socket => {
                 console.log(err);
             } else{
                 console.log("Bid added");
-                console.log(auction);
+                // console.log(auction);
                 if (auction) {
-                    console.log("auction id: ");
-                    console.log(auction.id);
                     safeJoin(auction.id);
                     io.emit("auction", auction);
                     // socket.emit("auction", newAuction);
@@ -56,9 +54,9 @@ io.on("connection", socket => {
 
 router.get('/', function (req, res, next) {
     auctionController.getAuctions(req, res);
-    console.log("Aucti0ons");
 });
 
+// Find Auction
 router.get('/:id', function (req, res) {
     // auctionController.getAuction(req.params.id);
     Auction.findById(req.params.id).exec(function(err, auction){
@@ -70,7 +68,9 @@ router.get('/:id', function (req, res) {
     });
 });
 
+// Add Bid - Shouldn't be used
 router.post('/:id', function (req, res) {
+    console.log("WOAHHH");
     auctionController.addBid(req, res);      // ALSo is this how I should be usuinf x=controllers and stuff?
 });
 
