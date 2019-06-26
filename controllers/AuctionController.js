@@ -17,24 +17,41 @@ exports.getAuctions = function (req, res) {
     }));
 };
 
-exports.getAuction = function(req, res){
-    Auction.findById(req.params.id).exec(function(err, auction){
-        if(auction){
-            res.json(auction);
+exports.getAuction = function(auctionId) {
+    console.log(auctionId);
+    Auction.findById(auctionId).exec(function(err, auction){
+        if(err){
+            console.log("Error fetching Auction");
         }else{
-            console.log("Error Fetching Auction - None found for given ID");
+            return auction;
         }
     });
-};
+}
 
-exports.addBid = function(req, res){
-    console.log('adfadsf: ' + req.params.id);
-    Auction.findOneAndUpdate({_id: req.params.id}, {$push: {'graphDataSets.0.data' :  {x: req.body.pps, y: req.body.numShares}, } } , {new: true}, function(err, auction){
+// exports.getAuction = function(req, res){
+//     Auction.findById(req.params.id).exec(function(err, auction){
+//         if(auction){
+//             res.json(auction);
+//         }else{
+//             console.log("Error Fetching Auction - None found for given ID");
+//         }
+//     });
+// };
+
+function addBid (auctionId, pps, numShares){
+    Auction.findOneAndUpdate({_id: auctionId}, {$push: {'graphDataSets.0.data' :  {x: pps, y: numShares}, } } , {new: true}, function(err, auction){
        if(err){
            console.log(err);
        } else{
            console.log("Bid added");
-           res.json(auction);
+           console.log(auction.graphDataSets[0].data);
+           return auction;
        }
     });
+};
+
+module.exports = {
+    // getAuctions: getAuctions,
+    // getAuction: getAuction,
+    addBid: addBid
 };
