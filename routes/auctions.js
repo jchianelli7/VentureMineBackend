@@ -36,6 +36,9 @@ io.on("connection", socket => {
                     safeJoin(auction.id);
                     io.emit("auction", auction);
                     // socket.emit("auction", newAuction);
+
+                    //TODO: READ*******************************
+                    // https://www.thepolyglotdeveloper.com/2019/04/using-socketio-create-multiplayer-game-angular-nodejs/
                 }
                 // return auction;
             }
