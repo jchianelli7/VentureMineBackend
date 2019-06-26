@@ -26,7 +26,7 @@ exports.getAuction = function(auctionId) {
             return auction;
         }
     });
-}
+};
 
 // exports.getAuction = function(req, res){
 //     Auction.findById(req.params.id).exec(function(err, auction){
@@ -50,8 +50,3 @@ function addBid (auctionId, pps, numShares){
     });
 };
 
-module.exports = {
-    // getAuctions: getAuctions,
-    // getAuction: getAuction,
-    addBid: addBid
-};

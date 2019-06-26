@@ -23,29 +23,31 @@ io.on("connection", socket => {
         safeJoin(auctionId);
         console.log(auctionId);
         let auction = auctionController.getAuction(auctionId);
+
         socket.emit("auction", auction);
     });
 
     socket.on("bidPlaced", bidData => {
         console.log("Bid Data:");
+        console.log(bidData);
         Auction.findOneAndUpdate({_id: bidData.auctionId}, {$push: {'graphDataSets.0.data' :  {x: bidData.pps, y: bidData.numShares}, } } , {new: true}, function(err, auction){
             if(err){
                 console.log(err);
             } else{
                 console.log("Bid added");
-                console.log(auction.graphDataSets[0].data);
+                console.log(auction);
                 if (auction) {
                     console.log("auction id: ");
                     console.log(auction.id);
                     safeJoin(auction.id);
-                    io.emit("auction", newAuction);
+                    io.emit("auction", auction);
                     // socket.emit("auction", newAuction);
                 }
                 // return auction;
             }
         });
-        console.log("New Auction: ");
-        console.log(newAuction);
+        // console.log("New Auction: ");
+        // console.log(auction);
 
     });
 
@@ -58,7 +60,14 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/:id', function (req, res) {
-    auctionController.getAuction(req.params.id);
+    // auctionController.getAuction(req.params.id);
+    Auction.findById(req.params.id).exec(function(err, auction){
+        if(err){
+            console.log("Error fetching Auction");
+        }else{
+            res.json( auction);
+        }
+    });
 });
 
 router.post('/:id', function (req, res) {
