@@ -19,9 +19,10 @@ exports.getAuctions = function (req, res) {
 };
 
 exports.getAuction = function(auctionId) {
-    console.log(auctionId);
+    console.log(auctionId);x
     Auction.findById(auctionId).exec(function(err, auction){
         if(err){
+            console.log(auctionId);
             console.log("Error fetching Auction");
         }else{
             return auction;

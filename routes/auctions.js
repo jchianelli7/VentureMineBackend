@@ -15,17 +15,11 @@ io.on("connection", socket => {
     const safeJoin = currentId => {
         socket.leave(previousId);
         socket.join(currentId);
+        console.log("PREVIOUS: "  + previousId);
         previousId = currentId;
+        console.log("CURRENT: " + currentId);
         console.log("New Connection!");
     };
-
-    socket.on("getAuction", auctionId => {
-        safeJoin(auctionId);
-        console.log(auctionId);
-        let auction = auctionController.getAuction(auctionId);
-
-        socket.emit("auction", auction);
-    });
 
     socket.on("bidPlaced", bidData => {
         console.log("Bid Data:");
@@ -37,6 +31,8 @@ io.on("connection", socket => {
                 console.log("Bid added");
                 // console.log(auction);
                 if (auction) {
+                    console.log("**********");
+                    console.log(auction.id);
                     safeJoin(auction.id);
                     io.emit("auction", auction);
                     // socket.emit("auction", newAuction);
@@ -59,7 +55,8 @@ router.get('/', function (req, res, next) {
 // Find Auction
 router.get('/:id', function (req, res) {
     // auctionController.getAuction(req.params.id);
-    Auction.findById(req.params.id).exec(function(err, auction){
+    // console.log(req);
+    Auction.findOne({_id: req.params.id}).exec(function(err, auction){
         if(err){
             console.log("Error fetching Auction");
         }else{
