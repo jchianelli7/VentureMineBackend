@@ -10,45 +10,52 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
 server.listen(4000);
-io.on("connection", socket => {
-    let previousId;
-    const safeJoin = currentId => {
-        socket.leave(previousId);
-        socket.join(currentId);
-        console.log("PREVIOUS: "  + previousId);
-        previousId = currentId;
-        console.log("CURRENT: " + currentId);
-        console.log("New Connection!");
-    };
 
-    socket.on("bidPlaced", bidData => {
-        console.log("Bid Data:");
-        console.log(bidData);
-        Auction.findByIdAndUpdate(bidData.auctionId, {$push: {'graphDataSets.0.data' :  {x: bidData.pps, y: bidData.numShares}, },  $inc: {currentStrikePrice: 1}}, {new: true}, function(err, auction){
-            if(err){
-                console.log(err);
-            } else{
-                console.log("Bid added");
-                // console.log(auction);
-                if (auction) {
-                    console.log("**********");
-                    console.log(auction.id);
-                    safeJoin(auction.id);
-                    io.emit("auction", auction);
-                    // socket.emit("auction", newAuction);
-
-                    //TODO: READ*******************************
-                    // https://www.thepolyglotdeveloper.com/2019/04/using-socketio-create-multiplayer-game-angular-nodejs/
-                }
-                // return auction;
-            }
-        });
-        // console.log("New Auction: ");
-        // console.log(auction);
-
-    });
-
-});
+// io.on("connect", socket => {
+//     let previousId;
+//     // const safeJoin = currentId => {
+//     //     socket.leave(previousId);
+//     //     socket.join(currentId);
+//     //     console.log("PREVIOUS: "  + previousId);
+//     //     previousId = currentId;
+//     //     console.log("CURRENT: " + currentId);
+//     //     console.log("New Connection!");
+//     // };
+//
+//     socket.on('auctionLoaded', auctionId => {
+//        socket.join(auctionId);
+//        console.log("Auction Loaded - Joined Room");
+//     });
+//
+//     socket.on("bidPlaced", bidData => {
+//         console.log("Bid Data:");
+//         console.log(bidData);
+//         Auction.findByIdAndUpdate(bidData.auctionId, {$push: {'graphDataSets.0.data' :  {x: bidData.pps, y: bidData.numShares}, },  $inc: {currentStrikePrice: 1}}, {new: true}, function(err, auction){
+//             if(err){
+//                 console.log(err);
+//             } else{
+//                 console.log("Bid added");
+//                 // console.log(auction);
+//                 if (auction) {
+//                     console.log("**********");
+//                     console.log(auction.id);
+//                     // safeJoin(auction.id);
+//                     io.in(auction.id).emit("auction", auction);
+//                     // socket.emit("auction", newAuction);
+//
+//                     //TODO: READ*******************************
+//                     // https://www.thepolyglotdeveloper.com/2019/04/using-socketio-create-multiplayer-game-angular-nodejs/
+//                 }
+//             }
+//         });
+//
+//     });
+//
+//     socket.on('close', auctionId => {
+//         socket.leave(auctionId)
+//     })
+//
+// });
 
 
 router.get('/', function (req, res, next) {
@@ -68,10 +75,13 @@ router.get('/:id', function (req, res) {
     });
 });
 
+router.post('/:id', auctionController.placeBid);
+router.post('/:id/clear', auctionController.emptyBids);
+
 // Add Bid - Shouldn't be used
-router.post('/:id', function (req, res) {
-    console.log("WOAHHH");
-    auctionController.addBid(req, res);      // ALSo is this how I should be usuinf x=controllers and stuff?
-});
+// router.post('/:id', function (req, res) {
+//     console.log("WOAHHH");
+//     auctionController.addBid(req, res);
+// });
 
 module.exports = router;
