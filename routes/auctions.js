@@ -76,6 +76,7 @@ router.get('/:id', function (req, res) {
 });
 
 router.post('/:id', auctionController.placeBid);
+router.post('/:id/clear', auctionController.emptyBids);
 
 // Add Bid - Shouldn't be used
 // router.post('/:id', function (req, res) {
