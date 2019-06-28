@@ -10,16 +10,22 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
 server.listen(4000);
-io.on("connection", socket => {
+
+io.on("connect", socket => {
     let previousId;
-    const safeJoin = currentId => {
-        socket.leave(previousId);
-        socket.join(currentId);
-        console.log("PREVIOUS: "  + previousId);
-        previousId = currentId;
-        console.log("CURRENT: " + currentId);
-        console.log("New Connection!");
-    };
+    // const safeJoin = currentId => {
+    //     socket.leave(previousId);
+    //     socket.join(currentId);
+    //     console.log("PREVIOUS: "  + previousId);
+    //     previousId = currentId;
+    //     console.log("CURRENT: " + currentId);
+    //     console.log("New Connection!");
+    // };
+
+    socket.on('auctionLoaded', auctionId => {
+       socket.join(auctionId);
+       console.log("Auction Loaded - Joined Room");
+    });
 
     socket.on("bidPlaced", bidData => {
         console.log("Bid Data:");
@@ -33,20 +39,21 @@ io.on("connection", socket => {
                 if (auction) {
                     console.log("**********");
                     console.log(auction.id);
-                    safeJoin(auction.id);
-                    io.emit("auction", auction);
+                    // safeJoin(auction.id);
+                    io.in(auction.id).emit("auction", auction);
                     // socket.emit("auction", newAuction);
 
                     //TODO: READ*******************************
                     // https://www.thepolyglotdeveloper.com/2019/04/using-socketio-create-multiplayer-game-angular-nodejs/
                 }
-                // return auction;
             }
         });
-        // console.log("New Auction: ");
-        // console.log(auction);
 
     });
+
+    socket.on('close', auctionId => {
+        socket.leave(auctionId)
+    })
 
 });
 

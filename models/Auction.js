@@ -1,4 +1,7 @@
 var mongoose = require('mongoose');
+var Bid = require('./Bid');
+var BidSchema = mongoose.model('Bid').schema;
+
 
 var AuctionSchema = new mongoose.Schema({
     title: {type: String, required: true},
@@ -13,7 +16,9 @@ var AuctionSchema = new mongoose.Schema({
     reservePrice: {type: Number, required: true, default: 10},
     reserveMet: {type: Boolean, required: true},
     uniqueBidders: {type: Number, required: true, default: 0},
-    graphDataSets: [{}]
+    graphDataSets: [{}],
+    bids: {type: [BidSchema], required: true, default: []},
+    time : { type : Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Auction', AuctionSchema, 'Auctions');
