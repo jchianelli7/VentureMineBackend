@@ -97,6 +97,7 @@ exports.getStrikePrice = function (req, res, auction) {
         console.log("Last index: " + JSON.stringify(bids[i]));
         // return bids[i].pps;
         auction.currentStrikePrice = bids[i].pps;
+        auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
         auction.save(function (err) {
             if (err) {
                 console.log(err);
