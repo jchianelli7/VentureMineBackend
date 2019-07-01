@@ -15,37 +15,33 @@ server.listen(4000);
 io.on("connect", socket => {
     console.log("NEW CONNECTION: ");
 
-    // socket.on('auctionLoaded', auctionId => {
-    //    socket.join(auctionId);
-    //    console.log("Auction Loaded - Joined Room");
-    // });
 
-    socket.on("bidPlaced", bidData => {
-        console.log("Bid Data:");
+    socket.on('getBids', auctionId => {
+        Auction.findById(auctionId, function(err, auction){
+           if(err){
+               console.log(err);
+           } if(auction){
+               console.log("Get bids");
+               socket.join(auctionId);
+               console.log(io.sockets.adapter.rooms);
+               console.log("Joined Room: " + auctionId);
+               socket.emit('bidPlaced', auction);
+            }
+        });
+    });
+
+    socket.on("placeBid", bidData => {
         // console.log(bidData);
-        if (io.sockets.adapter.rooms[bidData.auctionId]) {
-            console.log("Already in the right room. Staying");
-        } else {
-            console.log("In the wrong room. Switching.");
-            socket.leaveAll();
-            socket.join(bidData.auctionId);
-        }
-        // Auction.findByIdAndUpdate(bidData.auctionId, {$push: {'graphDataSets.0.data' :  {x: bidData.pps, y: bidData.numShares}, bids: {pps: bidData.pps, numShares: bidData.numShares, auctionId: auc}},  $inc: {currentStrikePrice: 1}}, {new: true}, function(err, auction){
-        //     if(err){
-        //         console.log(err);
-        //     } else{
-        //         console.log("Bid added");
-        //         // console.log(auction);
-        //         if (auction) {
-        //             console.log("**********");
-        //             // safeJoin(auction.id);
-        //             console.log(auction);
-        //             console.log(">>>>>>>>>>>>>>>>");
-        //             io.in(auction.id).emit('auctionUpdated', auction);
-        //             // socket.emit("auction", newAuction);
-        //         }
-        //     }
-        // });
+        // if (io.sockets.adapter.rooms[bidData.auctionId]) {
+        //     console.log("Already in the right room. Staying");
+        // } else {
+        //     console.log("In the wrong room. Switching.");
+        //     console.log('Before: ', io.sockets.adapter.rooms);
+        //     socket.leaveAll();
+        //     console.log('\n\n');
+        //     console.log('After: ', io.sockets.adapter.rooms);
+        //     socket.join(bidData.auctionId);
+        // }
         Auction.findOne({_id: bidData.auctionId}, function (err, auction) {
             if (err) {
                 console.log("Error Finding Auction - Placing Bid");
@@ -53,6 +49,8 @@ io.on("connect", socket => {
             if (auction) {
                 auction.graphDataSets[0].data.push({x: bidData.numShares, y: bidData.pps});
                 auction.currentBids++;
+                socket.join(auction.id);
+                console.log(io.sockets.adapter.rooms);
 
 
                 Bid.create({
@@ -67,11 +65,6 @@ io.on("connect", socket => {
                         console.log("Error creating Bid");
                         // console.log(bidData);
                     }
-                    // console.log("CREATED BID: ");
-                    // console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-                    // console.log(auction);
-                    // console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-                    // console.log("^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
                     auction.bids.push(bid);
                     auction.currentStrikePrice = this.getStrikePrice(auction);
                     auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
@@ -79,9 +72,10 @@ io.on("connect", socket => {
                         if (err) {
                             console.log("error saving auction after bid");
                         } else {
-                            console.log("New Auction");
-                            // console.log(auction);
-                            io.in(auction.id).emit('auctionUpdated', auction);
+                            console.log('\n\n\n');
+                            console.log("placed Bid");
+                            // io.emit('bidPlaced', auction);
+                            io.in(auction.id).emit('bidPlaced', auction);
                         }
                     });
                     // console.log("Strike Price: " + this.getStrikePrice(auction));
@@ -119,7 +113,7 @@ router.get('/:id', function (req, res) {
         }
     });
 });
-router.post('/:id', auctionController.placeBid);
+// router.post('/:id', auctionController.placeBid);
 router.post('/:id/clear', auctionController.emptyBids);
 
 
@@ -130,9 +124,6 @@ getStrikePrice = function (auction){
     if (auction.bids.length === 0) {
        return 0;
 
-    }else{
-        console.log("BIDS EXIST: ");
-        console.log(auction.bids);
     }
     let b = auction.bids;
     var bids = auction.bids.slice().sort(function (a, b) {
@@ -146,19 +137,6 @@ getStrikePrice = function (auction){
     }
     //Sell remaining shares that escaped while loop
     if (sharesRemaining > 0) {
-        console.log("Last bid (Strike Price Winner): " + JSON.stringify(bids[i]));
-        // return bids[i].pps;
-        // auction.currentStrikePrice = bids[i].pps;
-        // auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
-        // auction.save(function (err) {
-        //     if (err) {
-        //         console.log(err);
-        //     } else {
-        //         console.log("**********");
-        //         // console.log(auction);
-        //         return auction;
-        //     }
-        // });
         return bids[i].pps;
     }
 
