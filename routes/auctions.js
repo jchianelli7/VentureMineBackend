@@ -68,6 +68,8 @@ io.on("connect", socket => {
                     auction.bids.push(bid);
                     auction.currentStrikePrice = this.getStrikePrice(auction);
                     auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
+                    auction.currentBids++;
+
                     auction.save(function (err) {
                         if (err) {
                             console.log("error saving auction after bid");
