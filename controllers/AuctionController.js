@@ -78,23 +78,18 @@ exports.getStrikePrice = function (req, res, auction) {
         })
     }
     let b = auction.bids;
-    console.log("Original Bids: " + JSON.stringify(b));
     var bids = auction.bids.slice().sort(function(a, b){
         return b.pps - a.pps;
     });
-    console.log("Sorted Bids: " + JSON.stringify(bids));
     let sharesRemaining = auction.sharesOffered;
     let i = 0;
     while (sharesRemaining - bids[i].numShares > 0 && i < bids.length - 1) {
         sharesRemaining -= bids[i].numShares;
-        console.log("Shares Remaining: " + sharesRemaining);
-        // console.log("Current Bid: bids[" + i + "]: " + bids[i]);
         i++;
     }
     //Sell remaining shares that escaped while loop
     if (sharesRemaining > 0) {
-        console.log("EXITED LOOP --- Shares Remaining:  " + sharesRemaining);
-        console.log("Last index: " + JSON.stringify(bids[i]));
+        console.log("Last bid (Strike Price Winner): " + JSON.stringify(bids[i]));
         // return bids[i].pps;
         auction.currentStrikePrice = bids[i].pps;
         auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
@@ -107,42 +102,6 @@ exports.getStrikePrice = function (req, res, auction) {
                 res.json(auction);
             }
         });
-
-
-        //  Auction.findOne({_id: auctionId}).exec(function (err, auc) {
-        //     if (err) {
-        //         console.log("Error finding Auction - In getStrikePrice");
-        //     }
-        //     if (auc) {
-        //        let bids = auc.bids;
-        //        let sharesRemaining = auc.sharesOffered;
-        //        let i = 0;
-        //        while(sharesRemaining - bids[i].numShares > 0 && i < bids.length){
-        //            sharesRemaining -= bids[i].numShares;
-        //        }
-        //        //Sell remaining shares that escaped while loop
-        //         if(sharesRemaining > 0){
-        //             console.log("Shares Remaining: " + sharesRemaining);
-        //             console.log("Last index: " + JSON.stringify(bids[i]));
-        //             // return bids[i].pps;
-        //             auc.currentStrikePrice = bids[i].pps;
-        //             auc.save(function(err){
-        //                 if(err) {
-        //                     console.log(err);
-        //                 }
-        //                 else{
-        //                     console.log("**********");
-        //                     console.log(auc);
-        //                 }
-        //             })
-        //             // i is at index of last bid to sell to, aka strike price index
-        //         }
-        //     }
-        // });
-
-        // console.log("Strike price before returning: ");
-        // console.log(strikePrice);
-        // return strikePrice;
     }
 };
 
