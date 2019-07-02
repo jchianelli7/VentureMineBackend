@@ -5,7 +5,7 @@ var BidSchema = mongoose.model('Bid').schema;
 
 var AuctionSchema = new mongoose.Schema({
     title: {type: String, required: true},
-    description: {type: String, required: true},
+    description: {type: String, required: true, default: ''},
     auctionStart: {type: String, required: true},
     auctionEnd: {type: String, required: true},
     sharesOffered: {type: Number, required: true},

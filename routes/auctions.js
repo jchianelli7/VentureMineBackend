@@ -73,6 +73,7 @@ io.on("connect", socket => {
                     auction.save(function (err) {
                         if (err) {
                             console.log("error saving auction after bid");
+                            console.log(err);
                         } else {
                             console.log('\n\n\n');
                             console.log("placed Bid");
