@@ -42,53 +42,58 @@ io.on("connect", socket => {
         //     console.log('After: ', io.sockets.adapter.rooms);
         //     socket.join(bidData.auctionId);
         // }
-        Auction.findOne({_id: bidData.auctionId}, function (err, auction) {
+
+        Bid.create({
+            ownerId: bidData.ownerId,
+            auctionId: bidData.auctionId,
+            numShares: bidData.numShares,
+            pps: bidData.pps,
+            date: Date.now()
+        }, function (err, bid) {
             if (err) {
-                console.log("Error Finding Auction - Placing Bid");
+                console.log(err);
+                console.log("Error creating Bid");
+                // console.log(bidData);
             }
-            if (auction) {
-                auction.graphDataSets[0].data.push({x: bidData.numShares, y: bidData.pps});
-                auction.currentBids++;
-                socket.join(auction.id);
-                console.log(io.sockets.adapter.rooms);
-
-
-                Bid.create({
-                    ownerId: bidData.ownerId,
-                    auctionId: auction.id,
-                    numShares: bidData.numShares,
-                    pps: bidData.pps,
-                    date: Date.now()
-                }, function (err, bid) {
+            if(bid){
+                Auction.findOneAndUpdate({_id: bidData.auctionId}, {$push: {'graphDataSets.0.data': {
+                            x: bidData.pps,
+                            y: bidData.numShares
+                        }, 'bids': bid
+                    }, $inc: {currentBids: 1},
+                    // $set: {currentStrikePrice: module.exports.getStrikePrice(req.params.id)}
+                }, {new: true}, function (err, auction) {
                     if (err) {
-                        console.log(err);
-                        console.log("Error creating Bid");
-                        // console.log(bidData);
+                        console.log("Error Finding Auction - Placing Bid");
                     }
-                    auction.bids.push(bid);
-                    auction.currentStrikePrice = this.getStrikePrice(auction);
-                    auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
-                    auction.currentBids++;
-
-                    auction.save(function (err) {
-                        if (err) {
-                            console.log("error saving auction after bid");
-                            console.log(err);
-                        } else {
-                            console.log('\n\n\n');
-                            console.log("placed Bid");
-                            // io.emit('bidPlaced', auction);
-                            io.in(auction.id).emit('bidPlaced', auction);
-                        }
-                    });
-                    // console.log("Strike Price: " + this.getStrikePrice(auction));
-
+                    if (auction) {
+                        socket.join(auction.id);
+                        auction.currentStrikePrice = this.getStrikePrice(auction);
+                        auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
+                        auction.save(function (err) {
+                            if (err) {
+                                console.log("error saving auction after bid");
+                                console.log(err);
+                            } else {
+                                console.log('\n\n\n');
+                                console.log("placed Bid");
+                                console.log(auction.graphDataSets[0]);
+                                io.in(auction.id).emit('bidPlaced', auction);
+                                // io.emit('bidPlaced', auction);
+                            }
+                        });
+                        console.log(io.sockets.adapter.rooms);
+                    }
                 });
 
-
-
             }
+
+
+
+            // console.log("Strike Price: " + this.getStrikePrice(auction));
+
         });
+
 
     });
 

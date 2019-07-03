@@ -106,7 +106,7 @@ exports.getStrikePrice = function (req, res, auction) {
 };
 
 exports.emptyBids = function (req, res) {
-    Auction.findOneAndUpdate({_id: req.params.id}, {$set: {bids: [], graphDataSets:  [{ data: [] }], currentStrikePrice: 0, currentBids: 0, reserveMet: false, uniqueBidders: 0},}, {new: true}, function(err, auction){
+    Auction.findOneAndUpdate({_id: req.params.id}, {$set: {bids: [], 'graphDataSets.0.data':  [], currentStrikePrice: 0, currentBids: 0, reserveMet: false, uniqueBidders: 0},}, {new: true}, function(err, auction){
        if(err){
            console.log(err);
        }
