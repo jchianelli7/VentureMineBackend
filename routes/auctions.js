@@ -31,17 +31,6 @@ io.on("connect", socket => {
     });
 
     socket.on("placeBid", bidData => {
-        // console.log(bidData);
-        // if (io.sockets.adapter.rooms[bidData.auctionId]) {
-        //     console.log("Already in the right room. Staying");
-        // } else {
-        //     console.log("In the wrong room. Switching.");
-        //     console.log('Before: ', io.sockets.adapter.rooms);
-        //     socket.leaveAll();
-        //     console.log('\n\n');
-        //     console.log('After: ', io.sockets.adapter.rooms);
-        //     socket.join(bidData.auctionId);
-        // }
 
         Bid.create({
             ownerId: bidData.ownerId,
