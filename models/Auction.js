@@ -16,7 +16,7 @@ var AuctionSchema = new mongoose.Schema({
     reservePrice: {type: Number, required: true, default: 10},
     reserveMet: {type: Boolean, required: true},
     uniqueBidders: {type: Number, required: true, default: 0},
-    graphDataSets: {type: [{}], default: [{}]},
+    graphDataSets: {type: [{}], default: [{}], required: false},
     bids: {type: [BidSchema], required: true, default: []},
     time : { type : Date, default: Date.now }
 });
