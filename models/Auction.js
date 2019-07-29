@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 var Bid = require('./Bid');
+var VolumeData = require('./VolumeData');
+var VolSchema = mongoose.model('VolumeData').schema;
 var BidSchema = mongoose.model('Bid').schema;
 
 
@@ -18,7 +20,9 @@ var AuctionSchema = new mongoose.Schema({
     uniqueBidders: {type: Number, required: true, default: 0},
     graphDataSets: {type: [{}], default: [{}], required: false},
     bids: {type: [BidSchema], required: true, default: []},
-    time : { type : Date, default: Date.now }
+    time : { type : Date, default: Date.now },
+    currentCommittedCapital: {type: Number, required: false, default: 0},
+    volumeData: {type: [VolSchema], default: [], required: true}
 });
 
 module.exports = mongoose.model('Auction', AuctionSchema, 'Auctions');

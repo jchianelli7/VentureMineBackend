@@ -1,6 +1,7 @@
 var User = require('../models/User');
 var Auction = require('../models/Auction');
 var Bid = require('../models/Bid');
+var VolumeData = require('../models/VolumeData');
 var userController = require('../controllers/UserController');
 var auctionController = require('../controllers/AuctionController');
 var express = require('express');
@@ -17,21 +18,18 @@ io.on("connect", socket => {
 
 
     socket.on('getBids', auctionId => {
-        Auction.findById(auctionId, function(err, auction){
-           if(err){
-               console.log(err);
-           } if(auction){
-               console.log("Get bids");
-               socket.join(auctionId);
-               console.log(io.sockets.adapter.rooms);
-               console.log("Joined Room: " + auctionId);
-               socket.emit('bidPlaced', auction);
+        Auction.findById(auctionId, function (err, auction) {
+            if (err) {
+                console.log(err);
+            }
+            if (auction) {
+                socket.join(auctionId);
+                socket.emit('bidPlaced', auction);
             }
         });
     });
 
     socket.on("placeBid", bidData => {
-
         Bid.create({
             ownerId: bidData.ownerId,
             auctionId: bidData.auctionId,
@@ -42,15 +40,15 @@ io.on("connect", socket => {
             if (err) {
                 console.log(err);
                 console.log("Error creating Bid");
-                // console.log(bidData);
             }
-            if(bid){
-                Auction.findOneAndUpdate({_id: bidData.auctionId}, {$push: {'graphDataSets.0.data': {
+            if (bid) {
+                Auction.findOneAndUpdate({_id: bidData.auctionId}, {
+                    $push: {
+                        'graphDataSets.0.data': {
                             x: bidData.pps,
                             y: bidData.numShares
                         }, 'bids': bid
                     }, $inc: {currentBids: 1},
-                    // $set: {currentStrikePrice: module.exports.getStrikePrice(req.params.id)}
                 }, {new: true}, function (err, auction) {
                     if (err) {
                         console.log("Error Finding Auction - Placing Bid");
@@ -59,40 +57,44 @@ io.on("connect", socket => {
                         socket.join(auction.id);
                         auction.currentStrikePrice = this.getStrikePrice(auction);
                         auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
-                        auction.save(function (err) {
-                            if (err) {
-                                console.log("error saving auction after bid");
-                                console.log(err);
-                            } else {
-                                console.log('\n\n\n');
-                                console.log("placed Bid");
-                                console.log(auction.graphDataSets[0]);
-                                io.in(auction.id).emit('bidPlaced', auction);
-                                // io.emit('bidPlaced', auction);
-                            }
-                        });
-                        console.log(io.sockets.adapter.rooms);
+                        VolumeData.findOneAndUpdate({
+                                auctionId: bidData.auctionId,
+                                pps: bid.pps
+                            }, {$inc: {count: 1}}, {new: true}, function (err, volData) {
+                                if (err) {
+                                    console.log("Error Updating Volume Data");
+                                }
+                                if (volData) {
+                                    auction.volumeData = volData;
+                                } else {
+                                    auction.volumeData.push({auctionId: bidData.auctionId, pps: bid.pps, count: 1});
+                                    VolumeData.create({
+                                        auctionId: bidData.auctionId,
+                                        pps: bidData.pps,
+                                        count: 1
+                                    }, function (err, volData) {
+                                        if (err) {
+                                            console.log("Error Inserting Volume Data, ", err);
+                                        }
+                                    })
+                                }
+                                auction.save(function (err) {
+                                    if (err) {
+                                        console.log("Error Saving - 81", err);
+                                    }
+                                });
+                            });
                     }
                 });
-
             }
-
-
-
-            // console.log("Strike Price: " + this.getStrikePrice(auction));
-
         });
-
-
     });
 
     socket.on('close', auctionId => {
         socket.leave(auctionId);
         console.log("Closed Connection");
     })
-
 });
-
 
 router.get('/', function (req, res, next) {
     auctionController.getAuctions(req, res);
@@ -100,8 +102,6 @@ router.get('/', function (req, res, next) {
 
 // Find Auction
 router.get('/:id', function (req, res) {
-    // auctionController.getAuction(req.params.id);
-    // console.log(req);
     Auction.findOne({_id: req.params.id}).exec(function (err, auction) {
         if (err) {
             console.log("Error fetching Auction");
@@ -114,13 +114,9 @@ router.get('/:id', function (req, res) {
 router.post('/:id/clear', auctionController.emptyBids);
 
 
-getStrikePrice = function (auction){
-    // console.log("------------------------------");
-    // console.log(auction);
-    // console.log("------------------------------");
+getStrikePrice = function (auction) {
     if (auction.bids.length === 0) {
-       return 0;
-
+        return 0;
     }
     let b = auction.bids;
     var bids = auction.bids.slice().sort(function (a, b) {
@@ -137,7 +133,6 @@ getStrikePrice = function (auction){
         return bids[i].pps;
     }
 
-}
-;
+};
 
 module.exports = router;
