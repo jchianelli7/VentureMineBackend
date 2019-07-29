@@ -59,27 +59,53 @@ io.on("connect", socket => {
                         auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
                         console.log("\n**************************");
                         console.log("Volume Data - Initial: ", auction.volumeData);
-                        const vol = auction.volumeData.find(function(v) {
-                           return v.pps === bid.pps;
+                        var foundData = false;
+                        auction.volumeData.forEach(function(v) {
+                            console.log(v);
+                            if(v.pps === bid.pps){
+                                v.bidCount++;
+                                console.log("Found & Incremented: ", auction.volumeData);
+                                console.log(auction.volumeData[auction.volumeData.indexOf(v)]);
+                                foundData = true;
+                            }
                         });
-                        if(vol != null){
-                            console.log("Found Existing Volume Data: ", vol);
-                            console.log("Count Before: " , vol.bidCount);
-                            vol.bidCount++;
-                            console.log("Count After: " , vol.bidCount);
-                            console.log("Updated Value: ", auction.volumeData);
+                        if(foundData === false){
+                            console.log("Didn't find value, adding now");
+                            auction.volumeData.push({pps: bid.pps, bidCount: 1});
                         }else{
-                            console.log("No Existing Volume Data For PPS: ", bid.pps);
-                            auction.volumeData.push({'pps': bid.pps, 'bidCount': 1});
+                            console.log("found data aparently...?", foundData)
                         }
-                        auction.save(function(err) {
+                        auction.save(function(err, savedAuction) {
                             if(err){
                                 console.log("Error Saving Auction");
                             }else{
-                                console.log("Successfully Saved Auction\n\n\n");
+                                console.log("Successfully Saved Auction");
+                                console.log(auction.volumeData);
                                 socket.emit('bidPlaced', auction);
                             }
                         })
+                        // const vol = auction.volumeData.find(function(v) {
+                        //    return v.pps === bid.pps;
+                        // });
+                        // if(vol != null){
+                        //     console.log("Found Existing Volume Data: ", vol);
+                        //     console.log("Count Before: " , vol.bidCount);
+                        //     vol.bidCount++;
+                        //     console.log("Count After: " , vol.bidCount);
+                        //     console.log("Updated Value: ", auction.volumeData);
+                        // }else{
+                        //     console.log("No Existing Volume Data For PPS: ", bid.pps);
+                        //     auction.volumeData.push({'pps': bid.pps, 'bidCount': 1});
+                        // }
+                        // auction.save(function(err, savedAuction) {
+                        //     if(err){
+                        //         console.log("Error Saving Auction");
+                        //     }else{
+                        //         console.log("Successfully Saved Auction\n\n\n");
+                        //         console.log(savedAuction.volumeData);
+                        //         socket.emit('bidPlaced', savedAuction);
+                        //     }
+                        // })
                     }
                 });
             }

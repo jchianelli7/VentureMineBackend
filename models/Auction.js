@@ -22,7 +22,7 @@ var AuctionSchema = new mongoose.Schema({
     bids: {type: [BidSchema], required: true, default: []},
     time : { type : Date, default: Date.now },
     currentCommittedCapital: {type: Number, required: false, default: 0},
-    volumeData: {type: [], default: [], required: true}
+    volumeData: {type: [{}], default: [{}], required: true}
 });
 
 module.exports = mongoose.model('Auction', AuctionSchema, 'Auctions');
