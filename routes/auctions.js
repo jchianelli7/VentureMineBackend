@@ -65,7 +65,14 @@ io.on("connect", socket => {
                                     console.log("Error Updating Volume Data");
                                 }
                                 if (volData) {
-                                    auction.volumeData = volData;
+                                    let vol = auction.volumeData.find(function (v){
+                                        return v.pps = bidData.pps;
+                                    });
+                                    vol.count++;
+                                    console.log(volData);
+                                    console.log("**************************************************");
+                                    console.log(auction.volumeData);
+                                    console.log("**************************************************");
                                 } else {
                                     auction.volumeData.push({auctionId: bidData.auctionId, pps: bid.pps, count: 1});
                                     VolumeData.create({
@@ -112,7 +119,6 @@ router.get('/:id', function (req, res) {
 });
 // router.post('/:id', auctionController.placeBid);
 router.post('/:id/clear', auctionController.emptyBids);
-
 
 getStrikePrice = function (auction) {
     if (auction.bids.length === 0) {

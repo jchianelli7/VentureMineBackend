@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var User = require('../models/User');
 var Auction = require('../models/Auction');
 var Bid = require('../models/Bid');
+var Volume = require('../models/VolumeData');
 var request = require('request');
 
 exports.getAuctions = function (req, res) {
@@ -119,6 +120,12 @@ exports.emptyBids = function (req, res) {
        if(auction){
            res.json(auction);
        }
+    });
+    Volume.remove({auctionId: req.params.id}, function(err, idk){
+        if(err){
+            console.log("Error Removing Volume Data");
+        }
+        console.log("Deleted Volume Data For Auction: ", req.params.id);
     });
 };
 
