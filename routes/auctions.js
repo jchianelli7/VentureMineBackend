@@ -1,7 +1,7 @@
 var User = require('../models/User');
 var Auction = require('../models/Auction');
 var Bid = require('../models/Bid');
-var VolumeData = require('../models/VolumeData');
+// var VolumeData = require('../models/VolumeData');
 var userController = require('../controllers/UserController');
 var auctionController = require('../controllers/AuctionController');
 var express = require('express');
@@ -57,40 +57,29 @@ io.on("connect", socket => {
                         socket.join(auction.id);
                         auction.currentStrikePrice = this.getStrikePrice(auction);
                         auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
-                        VolumeData.findOneAndUpdate({
-                                auctionId: bidData.auctionId,
-                                pps: bid.pps
-                            }, {$inc: {count: 1}}, {new: true}, function (err, volData) {
-                                if (err) {
-                                    console.log("Error Updating Volume Data");
-                                }
-                                if (volData) {
-                                    let vol = auction.volumeData.find(function (v){
-                                        return v.pps = bidData.pps;
-                                    });
-                                    vol.count++;
-                                    console.log(volData);
-                                    console.log("**************************************************");
-                                    console.log(auction.volumeData);
-                                    console.log("**************************************************");
-                                } else {
-                                    auction.volumeData.push({auctionId: bidData.auctionId, pps: bid.pps, count: 1});
-                                    VolumeData.create({
-                                        auctionId: bidData.auctionId,
-                                        pps: bidData.pps,
-                                        count: 1
-                                    }, function (err, volData) {
-                                        if (err) {
-                                            console.log("Error Inserting Volume Data, ", err);
-                                        }
-                                    })
-                                }
-                                auction.save(function (err) {
-                                    if (err) {
-                                        console.log("Error Saving - 81", err);
-                                    }
-                                });
-                            });
+                        console.log("\n**************************");
+                        console.log("Volume Data - Initial: ", auction.volumeData);
+                        const vol = auction.volumeData.find(function(v) {
+                           return v.pps === bid.pps;
+                        });
+                        if(vol != null){
+                            console.log("Found Existing Volume Data: ", vol);
+                            console.log("Count Before: " , vol.bidCount);
+                            vol.bidCount++;
+                            console.log("Count After: " , vol.bidCount);
+                            console.log("Updated Value: ", auction.volumeData);
+                        }else{
+                            console.log("No Existing Volume Data For PPS: ", bid.pps);
+                            auction.volumeData.push({'pps': bid.pps, 'bidCount': 1});
+                        }
+                        auction.save(function(err) {
+                            if(err){
+                                console.log("Error Saving Auction");
+                            }else{
+                                console.log("Successfully Saved Auction\n\n\n");
+                                socket.emit('bidPlaced', auction);
+                            }
+                        })
                     }
                 });
             }
@@ -138,7 +127,6 @@ getStrikePrice = function (auction) {
     if (sharesRemaining > 0) {
         return bids[i].pps;
     }
-
 };
 
 module.exports = router;

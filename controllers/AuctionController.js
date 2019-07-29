@@ -121,11 +121,5 @@ exports.emptyBids = function (req, res) {
            res.json(auction);
        }
     });
-    Volume.remove({auctionId: req.params.id}, function(err, idk){
-        if(err){
-            console.log("Error Removing Volume Data");
-        }
-        console.log("Deleted Volume Data For Auction: ", req.params.id);
-    });
 };
 
