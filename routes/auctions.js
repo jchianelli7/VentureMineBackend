@@ -48,7 +48,7 @@ io.on("connect", socket => {
                             x: bidData.pps,
                             y: bidData.numShares
                         }, 'bids': bid
-                    }, $inc: {currentBids: 1},
+                    }, $inc: {currentBids: 1, currentCommittedCapital: (bid.pps * bid.numShares)},
                 }, {new: true}, function (err, auction) {
                     if (err) {
                         console.log("Error Finding Auction - Placing Bid");
@@ -59,22 +59,8 @@ io.on("connect", socket => {
                         auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
                         console.log("\n**************************");
                         console.log("Volume Data - Initial: ", auction.volumeData);
-                        var foundData = false;
-                        auction.volumeData.forEach(function(v) {
-                            console.log(v);
-                            if(v.pps === bid.pps){
-                                v.bidCount++;
-                                console.log("Found & Incremented: ", auction.volumeData);
-                                console.log(auction.volumeData[auction.volumeData.indexOf(v)]);
-                                foundData = true;
-                            }
-                        });
-                        if(foundData === false){
-                            console.log("Didn't find value, adding now");
-                            auction.volumeData.push({pps: bid.pps, bidCount: 1});
-                        }else{
-                            console.log("found data aparently...?", foundData)
-                        }
+                        auction.volumeData = this.updateVolumeData(auction, bid);
+
                         auction.save(function(err, savedAuction) {
                             if(err){
                                 console.log("Error Saving Auction");
@@ -84,28 +70,6 @@ io.on("connect", socket => {
                                 socket.emit('bidPlaced', auction);
                             }
                         })
-                        // const vol = auction.volumeData.find(function(v) {
-                        //    return v.pps === bid.pps;
-                        // });
-                        // if(vol != null){
-                        //     console.log("Found Existing Volume Data: ", vol);
-                        //     console.log("Count Before: " , vol.bidCount);
-                        //     vol.bidCount++;
-                        //     console.log("Count After: " , vol.bidCount);
-                        //     console.log("Updated Value: ", auction.volumeData);
-                        // }else{
-                        //     console.log("No Existing Volume Data For PPS: ", bid.pps);
-                        //     auction.volumeData.push({'pps': bid.pps, 'bidCount': 1});
-                        // }
-                        // auction.save(function(err, savedAuction) {
-                        //     if(err){
-                        //         console.log("Error Saving Auction");
-                        //     }else{
-                        //         console.log("Successfully Saved Auction\n\n\n");
-                        //         console.log(savedAuction.volumeData);
-                        //         socket.emit('bidPlaced', savedAuction);
-                        //     }
-                        // })
                     }
                 });
             }
@@ -153,6 +117,27 @@ getStrikePrice = function (auction) {
     if (sharesRemaining > 0) {
         return bids[i].pps;
     }
+};
+
+updateVolumeData = function (auction, bid) {
+    var foundData = false;
+    var volData = auction.volumeData.toObject();
+   volData.forEach(function(v) {
+        console.log(v);
+        if(v.pps === bid.pps){
+            v.bidCount = v.bidCount + 1;
+            console.log("Found & Incremented: ", volData);
+            console.log(volData[volData.indexOf(v)]);
+            foundData = true;
+        }
+    });
+    if(foundData === false){
+        console.log("Didn't find value, adding now");
+        volData.push({pps: bid.pps, bidCount: 1});
+    }else{
+        console.log("found data apparently...?", foundData)
+    }
+    return volData;
 };
 
 module.exports = router;
