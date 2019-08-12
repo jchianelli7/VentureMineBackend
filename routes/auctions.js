@@ -62,23 +62,21 @@ io.on("connect", socket => {
                         // auction.volumeData = this.updateVolumeData(auction, bid);
                         let foundData = false;
                         var auc = auction.toObject();
-                        var volData =auc.volumeData;
+                        var volData = auc.volumeData;
                         for(let x = 0; x < volData.length; x++){
                             if(volData[x].pps === bidData.pps){
-                                volData[x].bidCount++;
+                                volData[x].shareCount = Number(bidData.numShares) + Number(volData[x].shareCount);
                                 foundData = true;
                             }
                         }
                         if(!foundData){
-                            volData.push({pps: bidData.pps, bidCount: 1});
+                            volData.push({pps: bidData.pps, shareCount: Number(bidData.numShares)});
                         }
                         auction.volumeData = volData;
                         auction.save(function(err, savedAuction) {
                             if(err){
                                 console.log("Error Saving Auction");
                             }else{
-                                console.log("Successfully Saved Auction");
-                                console.log(savedAuction.volumeData);
                                 socket.emit('bidPlaced', savedAuction);
                             }
                         })
