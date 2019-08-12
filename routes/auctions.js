@@ -57,9 +57,8 @@ io.on("connect", socket => {
                         socket.join(auction.id);
                         auction.currentStrikePrice = this.getStrikePrice(auction);
                         auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
-                        console.log("\n**************************");
-                        console.log("Volume Data - Initial: ", auction.volumeData);
-                        // auction.volumeData = this.updateVolumeData(auction, bid);
+
+                        /** UPDATE VOLUME DATA FOR AUCTION **/
                         let foundData = false;
                         var auc = auction.toObject();
                         var volData = auc.volumeData;
