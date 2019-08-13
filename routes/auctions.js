@@ -61,16 +61,24 @@ io.on("connect", socket => {
                         /** UPDATE VOLUME DATA FOR AUCTION **/
                         let foundData = false;
                         var auc = auction.toObject();
-                        var volData = auc.volumeData;
+                        var volData = auc.volumeData.sort(function(a, b){
+                            return a.pps - b.pps;
+                        });
                         for(let x = 0; x < volData.length; x++){
                             if(volData[x].pps === bidData.pps){
                                 volData[x].shareCount = Number(bidData.numShares) + Number(volData[x].shareCount);
                                 foundData = true;
+                                if(volData[x + 1] === undefined || volData[x + 1].pps !== bidData.pps + 1){
+                                    volData.push({pps: bidData.pps + 1, shareCount: 0})
+                                }
                             }
                         }
                         if(!foundData){
-                            volData.push({pps: bidData.pps, shareCount: Number(bidData.numShares)});
+                            volData.push({pps: Number(bidData.pps), shareCount: Number(bidData.numShares)});
                         }
+                        volData.sort(function(a, b) {
+                            return a.pps - b.pps;
+                        });
                         auction.volumeData = volData;
                         auction.save(function(err, savedAuction) {
                             if(err){
