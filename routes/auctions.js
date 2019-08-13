@@ -71,6 +71,9 @@ io.on("connect", socket => {
                                 if(volData[x + 1] === undefined || volData[x + 1].pps !== bidData.pps + 1){
                                     volData.push({pps: bidData.pps + 1, shareCount: 0})
                                 }
+                                if(volData[x - 1] === undefined || volData[x-1].pps !== bidData.pps - 1) {
+                                    volData.push({pps: bidData.pps - 1, shareCount: 0})
+                                }
                             }
                         }
                         if(!foundData){
