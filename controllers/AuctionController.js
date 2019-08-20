@@ -2,7 +2,6 @@ var mongoose = require('mongoose');
 var User = require('../models/User');
 var Auction = require('../models/Auction');
 var Bid = require('../models/Bid');
-var Volume = require('../models/VolumeData');
 var request = require('request');
 
 exports.getAuctions = function (req, res) {

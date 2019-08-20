@@ -1,7 +1,5 @@
 var mongoose = require('mongoose');
 var Bid = require('./Bid');
-var VolumeData = require('./VolumeData');
-var VolSchema = mongoose.model('VolumeData').schema;
 var BidSchema = mongoose.model('Bid').schema;
 
 
@@ -18,7 +16,6 @@ var AuctionSchema = new mongoose.Schema({
     reservePrice: {type: Number, required: true, default: 10},
     reserveMet: {type: Boolean, required: true},
     uniqueBidders: {type: Number, required: true, default: 0},
-    graphDataSets: {type: [{}], default: [{}], required: false},        //TODO: Remove
     bids: {type: [BidSchema], required: true, default: []},
     time : { type : Date, default: Date.now },
     currentCommittedCapital: {type: Number, required: false, default: 0},
