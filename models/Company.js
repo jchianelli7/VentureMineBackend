@@ -9,6 +9,7 @@ var CompanySchema = new mongoose.Schema({
     staff: {type: [{}], required: true, default: []},
     documents: {type: [String], required: true, default: []},
     owner: {type: UserSchema, required: true},
+    activeAuctionId: {type: String, required: true, default: null}
 });
 
 module.exports = mongoose.model('Company', CompanySchema, 'Companies');
