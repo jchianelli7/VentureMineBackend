@@ -112,7 +112,7 @@ exports.getStrikePrice = function (req, res, auction) {
 };
 
 exports.emptyBids = function (req, res) {
-    Auction.findOneAndUpdate({_id: req.params.id}, {$set: {bids: [], 'graphDataSets.0.data':  [], currentStrikePrice: 0, currentBids: 0, reserveMet: false, uniqueBidders: 0, volumeData: [], currentCommittedCapital: 0},}, {new: true}, function(err, auction){
+    Auction.findOneAndUpdate({_id: req.params.id}, {$set: {bids: [], currentStrikePrice: 0, currentBids: 0, reserveMet: false, uniqueBidders: 0, volumeData: [], currentCommittedCapital: 0},}, {new: true}, function(err, auction){
        if(err){
            console.log(err);
        }
@@ -120,5 +120,11 @@ exports.emptyBids = function (req, res) {
            res.json(auction);
        }
     });
+    try {
+        Bid.deleteMany({"auctionId" : req.params.id}).then(result => console.log(`Deleted ${result.deletedCount} item(s).`));
+    } catch(e){
+        console.log('Error deleting Bids : ', e);
+    }
+
 };
 

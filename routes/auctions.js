@@ -31,7 +31,7 @@ io.on("connect", socket => {
 
     socket.on("placeBid", bidData => {
         Bid.create({
-            ownerId: bidData.ownerId,
+            userId: bidData.userId,
             auctionId: bidData.auctionId,
             numShares: bidData.numShares,
             pps: bidData.pps,
