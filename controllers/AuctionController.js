@@ -31,44 +31,6 @@ exports.getAuction = function (req, res) {
     });
 };
 
-exports.getStrikePrice = function (req, res, auction) {
-    if(auction.bids.length === 0){
-        auction.currentStrikePrice = 0;
-        auction.save(function(err){
-            if(err){
-                console.log("Error saving default strike price value");
-            }
-            res.json(auction);
-        })
-    }
-    let b = auction.bids;
-    var bids = auction.bids.slice().sort(function(a, b){
-        return b.pps - a.pps;
-    });
-    let sharesRemaining = auction.sharesOffered;
-    let i = 0;
-    while (sharesRemaining - bids[i].numShares > 0 && i < bids.length - 1) {
-        sharesRemaining -= bids[i].numShares;
-        i++;
-    }
-    //Sell remaining shares that escaped while loop
-    if (sharesRemaining > 0) {
-        console.log("Last bid (Strike Price Winner): " + JSON.stringify(bids[i]));
-        // return bids[i].pps;
-        auction.currentStrikePrice = bids[i].pps;
-        auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
-        auction.save(function (err) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log("**********");
-                // console.log(auction);
-                res.json(auction);
-            }
-        });
-    }
-};
-
 exports.emptyBids = function (req, res) {
     Auction.findOneAndUpdate({_id: req.params.id}, {$set: {bids: [], currentStrikePrice: 0, currentBids: 0, reserveMet: false, uniqueBidders: 0, volumeData: [], currentCommittedCapital: 0},}, {new: true}, function(err, auction){
        if(err){
@@ -86,7 +48,6 @@ exports.emptyBids = function (req, res) {
                    res.json(savedAuction);
                }
            });
-           // res.json(auction);
         }
     });
     try {

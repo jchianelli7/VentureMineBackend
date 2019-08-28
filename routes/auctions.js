@@ -44,10 +44,7 @@ io.on("connect", socket => {
             if (bid) {
                 Auction.findOneAndUpdate({_id: bidData.auctionId}, {
                     $push: {
-                        'graphDataSets.0.data': {
-                            x: bidData.pps,
-                            y: bidData.numShares
-                        }, 'bids': bid
+                        'bids': bid
                     }, $inc: {currentBids: 1, currentCommittedCapital: (bid.pps * bid.numShares)},
                 }, {new: true}, function (err, auction) {
                     if (err) {
@@ -58,7 +55,7 @@ io.on("connect", socket => {
 
                         console.log("Joined Room: ", auction.id);
                         auction.currentStrikePrice = this.getStrikePrice(auction);
-                        auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;
+                        auction.reserveMet = this.checkReserveStatus(auction);
 
                         /** UPDATE VOLUME DATA FOR AUCTION **/
                         let foundData = false;
@@ -68,7 +65,7 @@ io.on("connect", socket => {
                         });
                         for(let x = 0; x < volData.length; x++){
                             if(volData[x].pps === bidData.pps){
-                                volData[x].shareCount = Number(bidData.numShares) + Number(volData[x].shareCount);
+                                volData[x].shareCount += Number(bidData.numShares);
                                 foundData = true;
                             }
                         }
@@ -83,7 +80,6 @@ io.on("connect", socket => {
                             if(err){
                                 console.log("Error Saving Auction", err);
                             }else{
-                                // socket.emit('bidPlaced', savedAuction);
                                 io.in(bidData.auctionId).emit('bidPlaced', savedAuction);
                             }
 
@@ -156,6 +152,19 @@ updateVolumeData = function (auction, bid) {
         console.log("found data apparently...?", foundData)
     }
     return volData;
+};
+
+checkReserveStatus = function (auction){
+    var sharesAboveReserve = 0;
+    for(let x = 0; x < auction.bids.length - 1; x++ ){
+        if(auction.bids[x].pps >= auction.reserve.pps){
+            sharesAboveReserve += Number(auction.bids[x].numShares);
+            // console.log(Number(auction.bids[x].shareCount))
+            console.log("Found shares above strike price - count : " , Number(sharesAboveReserve));
+        }
+    }
+
+    return sharesAboveReserve > auction.reserve.shareCount;
 };
 
 module.exports = router;
