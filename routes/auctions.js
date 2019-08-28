@@ -52,8 +52,9 @@ io.on("connect", socket => {
                     }
                     if (auction) {
                         socket.join(auction.id);
-
-                        console.log("Joined Room: ", auction.id);
+                        /**  Calculate # of Unique Bidders **/
+                        let uniqueBidders = Array.from(new Set(auction.bids.map((bid) => bid.userId)));
+                        auction.uniqueBidders = uniqueBidders.length;
                         auction.currentStrikePrice = this.getStrikePrice(auction);
                         auction.reserveMet = this.checkReserveStatus(auction);
 
@@ -159,12 +160,10 @@ checkReserveStatus = function (auction){
     for(let x = 0; x < auction.bids.length - 1; x++ ){
         if(auction.bids[x].pps >= auction.reserve.pps){
             sharesAboveReserve += Number(auction.bids[x].numShares);
-            // console.log(Number(auction.bids[x].shareCount))
-            console.log("Found shares above strike price - count : " , Number(sharesAboveReserve));
         }
     }
 
-    return sharesAboveReserve > auction.reserve.shareCount;
+    return (sharesAboveReserve > auction.reserve.shareCount) ||  ((auction.currentStrikePrice > auction.reserve.pps) && (sharesAboveReserve > auction.reserve.shareCount));
 };
 
 module.exports = router;
