@@ -14,9 +14,6 @@ var io = require('socket.io')(server);
 server.listen(4000);
 
 io.on("connect", socket => {
-    console.log("NEW CONNECTION: ");
-
-
     socket.on('getBids', auctionId => {
         Auction.findById(auctionId, function (err, auction) {
             if (err) {
