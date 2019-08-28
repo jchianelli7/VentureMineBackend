@@ -55,6 +55,7 @@ io.on("connect", socket => {
                     }
                     if (auction) {
                         socket.join(auction.id);
+
                         console.log("Joined Room: ", auction.id);
                         auction.currentStrikePrice = this.getStrikePrice(auction);
                         auction.reserveMet = auction.currentStrikePrice >= auction.reservePrice;

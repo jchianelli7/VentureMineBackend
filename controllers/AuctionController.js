@@ -31,48 +31,6 @@ exports.getAuction = function (req, res) {
     });
 };
 
-exports.placeBid = function (req, res) {
-    Bid.create({
-        ownerId: req.body.userId,
-        auctionId: req.params.id,
-        numShares: req.body.numShares,
-        pps: req.body.pps
-    }, function (err, bid) {
-        if (err) {
-            console.log(err);
-        }
-        if (bid) {
-            Auction.findOneAndUpdate({_id: req.params.id}, {
-                $push: {
-                    'graphDataSets.0.data': {
-                        x: req.body.pps,
-                        y: req.body.numShares
-                    }, 'bids': bid
-                }, $inc: {currentBids: 1},
-                // $set: {currentStrikePrice: module.exports.getStrikePrice(req.params.id)}
-            }, {new: true}, function (err, auction) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    if (auction) {
-                        module.exports.getStrikePrice(req, res, auction);
-                        // TODO: THIS
-                        // for(Bid b in auction.bids){
-                        //     if(b.pps === bid.pps){
-                        //
-                        //     }
-                        // }
-                    }
-                    console.log("Auction Current Strike Price - In Bid");
-                    // console.log(auction.currentStrikePrice);
-                    // res.json(auction);
-                }
-            });
-        }
-    });
-
-};
-
 exports.getStrikePrice = function (req, res, auction) {
     if(auction.bids.length === 0){
         auction.currentStrikePrice = 0;
@@ -117,8 +75,19 @@ exports.emptyBids = function (req, res) {
            console.log(err);
        }
        if(auction){
-           res.json(auction);
-       }
+           for(let x = 0; x < 50; x++){
+               auction.volumeData.push({pps: x, shareCount: 0});
+           }
+           auction.save(function(err, savedAuction){
+               if(err){
+                   console.log("Error Saving Auction - Added Blank Defaults: ", err);
+               }
+               if(savedAuction){
+                   res.json(savedAuction);
+               }
+           });
+           // res.json(auction);
+        }
     });
     try {
         Bid.deleteMany({"auctionId" : req.params.id}).then(result => console.log(`Deleted ${result.deletedCount} item(s).`));
