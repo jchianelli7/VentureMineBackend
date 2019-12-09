@@ -15,6 +15,9 @@ server.listen(4000);
 
 io.on("connect", socket => {
     socket.on('getBids', auctionId => {
+        /**
+         * Find Bid/Auction Data for requested Auction & Join Socket Room
+        **/
         Auction.findById(auctionId, function (err, auction) {
             if (err) {
                 console.log(err);
@@ -27,6 +30,12 @@ io.on("connect", socket => {
     });
 
     socket.on("placeBid", bidData => {
+        /**
+         * Create a new bid (Insert) & Update the accompanying Auction.
+         * This behavior is very similar to a stored procedure, this is just the way it's done
+         * in MongoDB/Mongoose
+         **/
+
         Bid.create({
             userId: bidData.userId,
             auctionId: bidData.auctionId,
@@ -39,6 +48,12 @@ io.on("connect", socket => {
                 console.log("Error creating Bid");
             }
             if (bid) {
+                /**
+                 * UPDATE Auction
+                 *  SET CommittedCapital = (SELECT SUM(PPS) FROM Bids + (SELECT SUM(NumShares))
+                 *          )
+                 * WHERE Auction.ID = req.ID
+                 **/
                 Auction.findOneAndUpdate({_id: bidData.auctionId}, {
                     $push: {
                         'bids': bid

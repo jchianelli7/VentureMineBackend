@@ -37,9 +37,6 @@ exports.emptyBids = function (req, res) {
            console.log(err);
        }
        if(auction){
-           for(let x = 0; x < 50; x++){
-               auction.volumeData.push({pps: x, shareCount: 0});
-           }
            auction.save(function(err, savedAuction){
                if(err){
                    console.log("Error Saving Auction - Added Blank Defaults: ", err);
