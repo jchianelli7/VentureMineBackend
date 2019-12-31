@@ -38,6 +38,21 @@ router.get('/:id/bids/all', function (req, res) {
    })
 });
 
+router.get('/:id/active', function(req, res){
+   let active = [];
+   console.log("Hello");
+   Bid.find({userId: req.params.userId}, function(err, bids){
+       if(bids){
+           bids.forEach(function(bid){
+              if(bid.userId === req.userId){
+                  active.push(bid);
+              }
+           });
+       }
+   });
+   res.json(active);
+});
+
 // Get active user bids (bids on auctions still live)
 // router.get('/:id/bids', function(req, res, next){
 //     userController.getUserActiveBids(req, res);

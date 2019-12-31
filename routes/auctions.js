@@ -17,7 +17,7 @@ io.on("connect", socket => {
     socket.on('getBids', auctionId => {
         /**
          * Find Bid/Auction Data for requested Auction & Join Socket Room
-        **/
+         **/
         Auction.findById(auctionId, function (err, auction) {
             if (err) {
                 console.log(err);
@@ -33,7 +33,7 @@ io.on("connect", socket => {
         /**
          * Create a new bid (Insert) & Update the accompanying Auction.
          * This behavior is very similar to a stored procedure, this is just the way it's done
-         * in MongoDB/Mongoose
+         * in MongoDB/Mongoose/Javascript
          **/
 
         Bid.create({
@@ -73,26 +73,26 @@ io.on("connect", socket => {
                         /** UPDATE VOLUME DATA FOR AUCTION **/
                         let foundData = false;
                         var auc = auction.toObject();
-                        var volData = auc.volumeData.sort(function(a, b){
+                        var volData = auc.volumeData.sort(function (a, b) {
                             return a.pps - b.pps;
                         });
-                        for(let x = 0; x < volData.length; x++){
-                            if(volData[x].pps === bidData.pps){
+                        for (let x = 0; x < volData.length; x++) {
+                            if (volData[x].pps === bidData.pps) {
                                 volData[x].shareCount += Number(bidData.numShares);
                                 foundData = true;
                             }
                         }
-                        if(!foundData){
+                        if (!foundData) {
                             volData.push({pps: Number(bidData.pps), shareCount: Number(bidData.numShares)});
                         }
-                        volData.sort(function(a, b) {
+                        volData.sort(function (a, b) {
                             return a.pps - b.pps;
                         });
                         auction.volumeData = volData;
-                        auction.save(function(err, savedAuction) {
-                            if(err){
+                        auction.save(function (err, savedAuction) {
+                            if (err) {
                                 console.log("Error Saving Auction", err);
-                            }else{
+                            } else {
                                 io.in(bidData.auctionId).emit('bidPlaced', savedAuction);
                             }
 
@@ -149,33 +149,33 @@ getStrikePrice = function (auction) {
 updateVolumeData = function (auction, bid) {
     var foundData = false;
     var volData = auction.volumeData.toObject();
-   volData.forEach(function(v) {
+    volData.forEach(function (v) {
         console.log(v);
-        if(v.pps === bid.pps){
+        if (v.pps === bid.pps) {
             v.bidCount = v.bidCount + 1;
             console.log("Found & Incremented: ", volData);
             console.log(volData[volData.indexOf(v)]);
             foundData = true;
         }
     });
-    if(foundData === false){
+    if (foundData === false) {
         console.log("Didn't find value, adding now");
         volData.push({pps: bid.pps, bidCount: 1});
-    }else{
+    } else {
         console.log("found data apparently...?", foundData)
     }
     return volData;
 };
 
-checkReserveStatus = function (auction){
+checkReserveStatus = function (auction) {
     var sharesAboveReserve = 0;
-    for(let x = 0; x < auction.bids.length - 1; x++ ){
-        if(auction.bids[x].pps >= auction.reserve.pps){
+    for (let x = 0; x < auction.bids.length - 1; x++) {
+        if (auction.bids[x].pps >= auction.reserve.pps) {
             sharesAboveReserve += Number(auction.bids[x].numShares);
         }
     }
 
-    return (sharesAboveReserve > auction.reserve.shareCount) ||  ((auction.currentStrikePrice > auction.reserve.pps) && (sharesAboveReserve > auction.reserve.shareCount));
+    return (sharesAboveReserve > auction.reserve.shareCount) || ((auction.currentStrikePrice > auction.reserve.pps) && (sharesAboveReserve > auction.reserve.shareCount));
 };
 
 module.exports = router;

@@ -33,18 +33,21 @@ exports.getAuction = function (req, res) {
 
 exports.emptyBids = function (req, res) {
     Auction.findOneAndUpdate({_id: req.params.id}, {$set: {bids: [], currentStrikePrice: 0, currentBids: 0, reserveMet: false, uniqueBidders: 0, volumeData: [], currentCommittedCapital: 0},}, {new: true}, function(err, auction){
-       if(err){
-           console.log(err);
-       }
-       if(auction){
-           auction.save(function(err, savedAuction){
-               if(err){
-                   console.log("Error Saving Auction - Added Blank Defaults: ", err);
-               }
-               if(savedAuction){
-                   res.json(savedAuction);
-               }
-           });
+        if(err){
+            console.log(err);
+        }
+        if(auction){
+            for(let x = 25; x <= 75; x++){
+                auction.volumeData.push({pps: x, shareCount: null});
+            }
+            auction.save(function(err, savedAuction){
+                if(err){
+                    console.log("Error Saving Auction - Added Blank Defaults: ", err);
+                }
+                if(savedAuction){
+                    res.json(savedAuction);
+                }
+            });
         }
     });
     try {

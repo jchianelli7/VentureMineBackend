@@ -10,6 +10,7 @@ router.get('/', function (req, res, next) {
     db.get().collection('Users').find({}).toArray().then((users => {
         console.log('Users', users);
     }));
+    console.log('Dashboard Loaded');
     res.render('index', {title: 'Express'});
 });
 
